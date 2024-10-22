@@ -24,9 +24,10 @@ const RegisterPage = () => {
   const register = (event) => {
     event.preventDefault();
     const { name, email, password, confirmPassword, policy } = formData;
+    console.log(formData)
     const checkConfirmPassword = password === confirmPassword;
     if (!checkConfirmPassword) {
-      setPasswordError("비밀번호 중복확인이 일치하지 않습니다.");
+      setPasswordError("Passwords do not match");
       return;
     }
     if (!policy) {
