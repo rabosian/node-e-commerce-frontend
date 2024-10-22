@@ -24,7 +24,6 @@ const RegisterPage = () => {
   const register = (event) => {
     event.preventDefault();
     const { name, email, password, confirmPassword, policy } = formData;
-    console.log(formData)
     const checkConfirmPassword = password === confirmPassword;
     if (!checkConfirmPassword) {
       setPasswordError("Passwords do not match");
