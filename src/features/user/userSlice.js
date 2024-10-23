@@ -13,12 +13,12 @@ export const loginWithEmail = createAsyncThunk(
         // dispatch(
         //   showToastMessage({ message: "Login success!", status: "success" })
         // );
-        console.log(response.data)
+        sessionStorage.setItem("token", response.data.accessToken) 
+        localStorage.setItem("refreshToken", response.data.refreshToken)
         return response.data;
       }
     } catch (err) {
       // dispatch(showToastMessage({ message: "Login failed. Please try again", status: "error" }))
-      console.log(err)
       return rejectWithValue(err.error);
     }
   }
@@ -66,7 +66,17 @@ export const registerUser = createAsyncThunk(
 
 export const loginWithToken = createAsyncThunk(
   "user/loginWithToken",
-  async (_, { rejectWithValue }) => {}
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/users/auth")
+      if (response.status === 200) {
+        return response.data
+      }
+    } catch (err) {
+      return rejectWithValue(err.error)
+    }
+
+  }
 );
 
 const userSlice = createSlice({
@@ -110,7 +120,10 @@ const userSlice = createSlice({
       .addCase(loginWithEmail.rejected, (state, action) => {
         state.loading = false;
         state.loginError = action.payload;
-      });
+      })
+      .addCase(loginWithToken.fulfilled, (state, action) => {
+        state.user = action.payload.user
+      })
   },
 });
 export const { clearErrors } = userSlice.actions;
