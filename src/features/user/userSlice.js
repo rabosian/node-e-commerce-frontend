@@ -13,8 +13,8 @@ export const loginWithEmail = createAsyncThunk(
         // dispatch(
         //   showToastMessage({ message: "Login success!", status: "success" })
         // );
-        sessionStorage.setItem("token", response.data.accessToken) 
-        localStorage.setItem("refreshToken", response.data.refreshToken)
+        sessionStorage.setItem("token", response.data.accessToken);
+        localStorage.setItem("refreshToken", response.data.refreshToken);
         return response.data;
       }
     } catch (err) {
@@ -29,7 +29,14 @@ export const loginWithGoogle = createAsyncThunk(
   async (token, { rejectWithValue }) => {}
 );
 
-export const logout = () => (dispatch) => {};
+export const logout = createAsyncThunk(
+  "user/logout",
+  async (_, { dispatch }) => {
+    sessionStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    dispatch(showToastMessage({message: "Logout success", status: "success"}))
+  }
+);
 
 export const registerUser = createAsyncThunk(
   "user/registerUser", // action name
@@ -68,14 +75,13 @@ export const loginWithToken = createAsyncThunk(
   "user/loginWithToken",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/users/auth")
+      const response = await api.get("/users/auth");
       if (response.status === 200) {
-        return response.data
+        return response.data;
       }
     } catch (err) {
-      return rejectWithValue(err.error)
+      return rejectWithValue(err.error);
     }
-
   }
 );
 
@@ -115,15 +121,18 @@ const userSlice = createSlice({
       .addCase(loginWithEmail.fulfilled, (state, action) => {
         state.loading = false;
         state.loginError = null;
-        state.user = action.payload.user
+        state.user = action.payload.user;
       })
       .addCase(loginWithEmail.rejected, (state, action) => {
         state.loading = false;
         state.loginError = action.payload;
       })
       .addCase(loginWithToken.fulfilled, (state, action) => {
-        state.user = action.payload.user
+        state.user = action.payload.user;
       })
+      .addCase(logout.fulfilled, (state) => {
+        state.user = null;
+      });
   },
 });
 export const { clearErrors } = userSlice.actions;
